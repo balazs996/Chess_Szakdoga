@@ -16,16 +16,6 @@ import java.util.ArrayList;
 
 public class ChessAdapter extends ArrayAdapter {
         ArrayList<String> pieces;
-        int[] array = {
-                0, 1, 0, 1, 0, 1, 0, 1,
-                1, 0, 1, 0, 1, 0, 1, 0,
-                0, 1, 0, 1, 0, 1, 0, 1,
-                1, 0, 1, 0, 1, 0, 1, 0,
-                0, 1, 0, 1, 0, 1, 0, 1,
-                1, 0, 1, 0, 1, 0, 1, 0,
-                0, 1, 0, 1, 0, 1, 0, 1,
-                1, 0, 1, 0, 1, 0, 1, 0
-        };
 
     public ChessAdapter(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
         super(context, resource, objects);
@@ -47,8 +37,16 @@ public class ChessAdapter extends ArrayAdapter {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         v = inflater.inflate(R.layout.item_board, parent, false);
         TextView textView = (TextView) v.findViewById(R.id.boardcell);
-        textView.setBackgroundColor(array[position] == 0 ? getContext().getResources().getColor(R.color.colorBoardWhite) : getContext().getResources().getColor(R.color.colorBoardBlack));
-        v.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, GridView.AUTO_FIT));
+
+        int col = position % 8 + 1;
+        int row = position / 8 + 1;
+        boolean idCheck = (col % 2 == 0 && row % 2 == 0) || (col % 2 != 0 && row % 2 != 0);
+        int id = idCheck ? R.color.colorBoardWhite : R.color.colorBoardBlack;
+        textView.setBackgroundColor(getContext().getResources().getColor(id));
+
+        int width = getContext().getResources().getDisplayMetrics().widthPixels / 8;
+        v.setLayoutParams(new GridView.LayoutParams(width, width));
+
         return v;
     }
 }

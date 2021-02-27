@@ -1,6 +1,7 @@
 package pepe.hands.chess;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.GridView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,5 +26,6 @@ public class MainActivity extends AppCompatActivity {
 
         GridView gv = findViewById(R.id.gridview);
         gv.setAdapter(new ChessAdapter(MainActivity.this, R.layout.item_board, pieces));
+        Log.d(TAG, "onCreate: " + ChessConverter.codeToPosition("h8"));
     }
 }
