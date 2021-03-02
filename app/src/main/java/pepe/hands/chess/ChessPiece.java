@@ -1,0 +1,95 @@
+package pepe.hands.chess;
+
+public class ChessPiece {
+    public enum ChessColor {
+        WHITE, BLACK
+    }
+
+    public enum ChessType {
+        PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
+    }
+
+    ChessColor color;
+    ChessType type;
+    char picture;
+
+    public ChessPiece(ChessColor color, ChessType type) {
+        this.color = color;
+        this.type = type;
+        setPicture();
+    }
+
+    public ChessPiece() {
+    }
+
+    public ChessColor getColor() {
+        return color;
+    }
+
+    public ChessType getType() {
+        return type;
+    }
+
+    public char getPicture() {
+        return picture;
+    }
+
+    private void setPicture() {
+        if (this.color.equals(ChessColor.WHITE)) {
+            switch (type){
+                case PAWN : {
+                    this.picture = '\u2659';
+                    break;
+                }
+                case KNIGHT : {
+                    this.picture = '\u2658';
+                    break;
+                }
+                case BISHOP : {
+                    this.picture = '\u2657';
+                    break;
+                }
+                case ROOK : {
+                    this.picture = '\u2656';
+                    break;
+                }
+                case QUEEN : {
+                    this.picture = '\u2655';
+                    break;
+                }
+                case KING : {
+                    this.picture = '\u2654';
+                    break;
+                }
+            }
+
+        } else if (this.color.equals(ChessColor.BLACK)) {
+            switch (type){
+                case PAWN : {
+                    this.picture = '\u265F';
+                    break;
+                }
+                case KNIGHT : {
+                    this.picture = '\u265E';
+                    break;
+                }
+                case BISHOP : {
+                    this.picture = '\u265D';
+                    break;
+                }
+                case ROOK : {
+                    this.picture = '\u265C';
+                    break;
+                }
+                case QUEEN : {
+                    this.picture = '\u265B';
+                    break;
+                }
+                case KING : {
+                    this.picture = '\u265A';
+                    break;
+                }
+            }
+        }
+    }
+}

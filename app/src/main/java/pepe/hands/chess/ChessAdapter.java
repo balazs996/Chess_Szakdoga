@@ -15,9 +15,9 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 
 public class ChessAdapter extends ArrayAdapter {
-        ArrayList<String> pieces;
+        ArrayList<ChessPiece> pieces;
 
-    public ChessAdapter(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
+    public ChessAdapter(@NonNull Context context, int resource, @NonNull ArrayList<ChessPiece> objects) {
         super(context, resource, objects);
         pieces = objects;
 
@@ -37,6 +37,7 @@ public class ChessAdapter extends ArrayAdapter {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         v = inflater.inflate(R.layout.item_board, parent, false);
         TextView textView = (TextView) v.findViewById(R.id.boardcell);
+        textView.setText(String.valueOf(pieces.get(position).getPicture()));
 
         int col = position % 8 + 1;
         int row = position / 8 + 1;
