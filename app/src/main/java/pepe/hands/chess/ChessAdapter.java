@@ -50,4 +50,13 @@ public class ChessAdapter extends ArrayAdapter {
 
         return v;
     }
+    public void movePiece(int fromPosition, int toPosition){
+        pieces.set(toPosition, pieces.get(fromPosition));
+        pieces.set(fromPosition, new ChessPiece());
+        notifyDataSetChanged();
+
+    }
+    public ChessPiece getPiece(int position){
+        return pieces.get(position);
+    }
 }

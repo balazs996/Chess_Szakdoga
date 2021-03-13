@@ -9,9 +9,9 @@ public class ChessPiece {
         PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
     }
 
-    ChessColor color;
-    ChessType type;
-    char picture;
+    private ChessColor color;
+    private ChessType type;
+    private char picture;
 
     public ChessPiece(ChessColor color, ChessType type) {
         this.color = color;
