@@ -64,14 +64,21 @@ public class MainActivity extends AppCompatActivity {
                     clickedPosition = -1;
                     //Toast.makeText(MainActivity.this, "Szabálytalan lépés!", Toast.LENGTH_SHORT).show();
                     gv.getChildAt(position).setBackgroundTintList(null);
-
+                    for (String tempPosition:ChessUtility.calculateMoves(chessAdapter.getPiece(position), ChessUtility.positionToCode(position), pieces)) {
+                        gv.getChildAt(ChessUtility.codeToPosition(tempPosition)).setBackgroundTintList(null);
+                    }
 
                 }
                 else {
-                    chessAdapter.movePiece(clickedPosition, position);
-                    clickedPosition = -1;
-                    isWhiteTurn = !isWhiteTurn;
-                    gv.getChildAt(position).setBackgroundTintList(null);
+                    if (ChessUtility.calculateMoves(chessAdapter.getPiece(clickedPosition), ChessUtility.positionToCode(clickedPosition),pieces).contains(ChessUtility.positionToCode(position))) {
+                        chessAdapter.movePiece(clickedPosition, position);
+                        clickedPosition = -1;
+                        isWhiteTurn = !isWhiteTurn;
+                        gv.getChildAt(position).setBackgroundTintList(null);
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "Szabálytalan lépés!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
