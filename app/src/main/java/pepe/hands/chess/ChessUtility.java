@@ -3,6 +3,7 @@ package pepe.hands.chess;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ChessUtility {
     private static final String TAG = "ChessUtility";
@@ -20,9 +21,14 @@ public class ChessUtility {
         return ("" + letter + szam);
     }
 
-    public static ArrayList<ChessPiece> putDownPiece(ArrayList<ChessPiece> table, ChessPiece piece, String... Positions) {
-        for (String position : Positions) {
-            table.set(codeToPosition(position), piece);
+    public static ArrayList<ChessPiece> putDownPiece(ArrayList<ChessPiece> table, ChessPiece.ChessType type, String... Positions) {
+        for(ChessPiece.ChessColor color : ChessPiece.ChessColor.values()) {
+            String row = color == ChessPiece.ChessColor.WHITE ? "1" : "8";
+            if(type == ChessPiece.ChessType.PAWN)
+                row = color == ChessPiece.ChessColor.WHITE ? "2" : "7";
+            for (String position : Positions) {
+                table.set(codeToPosition(position+row), new ChessPiece(color, type));
+            }
         }
         return table;
     }
@@ -62,88 +68,22 @@ public class ChessUtility {
         ArrayList<String> bishopMoves = new ArrayList<>();
         int column = position.charAt(0) - 96;
         int row = Integer.parseInt(position.substring(1));
-        boolean upLeft, downRight, downLeft, upRight;
-        upLeft = downRight = downLeft = upRight = true;
+        ArrayList<String> operators = new ArrayList<>(Arrays.asList("+ +", "- -", "- +", "+ -"));
 
         Log.d(TAG, "tempPos: row: "+row + "__col: " + column);
-        for (int i = 1; (upLeft || downRight || downLeft || upRight); i++) {
-            if (column - i >= 1 && row - i >= 1 && downLeft){
-                int tempPosition = rowCC(row - i, column-i);
-                //TODO SWitch (ha kezeli a null-t)
-                if (board.get(tempPosition).getColor() == null){
+        for(String op: operators) {
+            boolean diagonal = true;
+            String[] ops = op.split(" ");
+            for(int i = 1; diagonal; i++) {
+                int rowX = ops[0].equals("+") ? row + i : row - i;
+                int columnX = ops[1].equals("+") ? column + i : column - i;
+                if(columnX > 8 || columnX < 1 || rowX > 8 || rowX < 1) break;
+                int tempPosition = rowCC(rowX, columnX);
+                if (board.get(tempPosition).getColor() == null || board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()) {
                     bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculatebishop1: "+ ChessUtility.positionToCode(tempPosition));
+                    Log.d(TAG, "calculateBishop: "+ ChessUtility.positionToCode(tempPosition));
                 }
-                if (board.get(tempPosition).getColor() == board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    Log.d(TAG, "calculatebishop2: "+ ChessUtility.positionToCode(tempPosition));
-                    downLeft = false;
-                }
-                if (board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculatebishop3: "+ ChessUtility.positionToCode(tempPosition));
-                    downLeft = false;
-                }
-            }
-            else{
-                downLeft = false;
-            }
-
-            if (column+i <= 8 && row + i <= 8 && upRight){
-                int tempPosition = rowCC(row + i, column+i);
-                //TODO SWitch (ha kezeli a null-t)
-                if (board.get(tempPosition).getColor() == null){
-                    bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculatebishop: "+ ChessUtility.positionToCode(tempPosition));
-                }
-                if (board.get(tempPosition).getColor() == board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    upRight = false;
-                }
-                if (board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculatebishop: "+ ChessUtility.positionToCode(tempPosition));
-                    upRight = false;
-                }
-            }
-            else{
-                upRight = false;
-            }
-            if (row + i  <= 8 && column - i >= 1 && upLeft){
-                int tempPosition = rowCC(row+i, column - i);
-                //TODO SWitch (ha kezeli a null-t)
-                if (board.get(tempPosition).getColor() == null){
-                    bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculatebishop: "+ ChessUtility.positionToCode(tempPosition));
-                }
-                if (board.get(tempPosition).getColor() == board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    upLeft = false;
-                }
-                if (board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculatebishop: "+ ChessUtility.positionToCode(tempPosition));
-                    upLeft = false;
-                }
-            }
-            else{
-                upLeft = false;
-            }
-            if (row - i >= 1 && column + i <= 8 && downRight){
-                int tempPosition = rowCC(row-i, column + i);
-                //TODO SWitch (ha kezeli a null-t)
-                if (board.get(tempPosition).getColor() == null){
-                    bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculatebishop: "+ ChessUtility.positionToCode(tempPosition));
-                }
-                if (board.get(tempPosition).getColor() == board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    downRight = false;
-                }
-                if (board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculatebishop: "+ ChessUtility.positionToCode(tempPosition));
-                    downRight = false;
-                }
-            }
-            else{
-                downRight = false;
+                if(board.get(tempPosition).getColor() != null) diagonal = false;
             }
         }
 
@@ -154,88 +94,20 @@ public class ChessUtility {
         ArrayList<String> rookMoves = new ArrayList<>();
         int column = position.charAt(0) - 96;
         int row = Integer.parseInt(position.substring(1));
-        boolean up, down, left, right;
-        up = down = left = right = true;
+        ArrayList<Integer> multiply_values = new ArrayList<>(Arrays.asList(0, -1, 0, 1, -1, 0, 1, 0));
 
-        Log.d(TAG, "tempPos: row: "+row + "__col: " + column);
-        for (int i = 1; (up || down || left || right); i++) {
-            if (column-i >= 1  && left){
-                int tempPosition = rowCC(row, column-i);
-                //TODO SWitch (ha kezeli a null-t)
-                if (board.get(tempPosition).getColor() == null){
-                    rookMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateRook1: "+ ChessUtility.positionToCode(tempPosition));
-                }
-                if (board.get(tempPosition).getColor() == board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    Log.d(TAG, "calculateRook2: "+ ChessUtility.positionToCode(tempPosition));
-                    left = false;
-                }
-                if (board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    rookMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateRook3: "+ ChessUtility.positionToCode(tempPosition));
-                    left = false;
-                }
-            }
-            else{
-                left = false;
-            }
-
-            if (column+i <= 8 && right){
-                int tempPosition = rowCC(row, column+i);
-                //TODO SWitch (ha kezeli a null-t)
-                if (board.get(tempPosition).getColor() == null){
+        for(int i = 0; i < multiply_values.size(); i+=2) {
+            boolean horizontal = true;
+            for (int j = 1; horizontal; j++) {
+                int rowX = row + (j* multiply_values.get(i));
+                int columnX = column + (j* multiply_values.get(i + 1));
+                if(columnX > 8 || columnX < 1 || rowX > 8 || rowX < 1) break;
+                int tempPosition = rowCC(rowX, columnX);
+                if (board.get(tempPosition).getColor() == null || board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()) {
                     rookMoves.add(ChessUtility.positionToCode(tempPosition));
                     Log.d(TAG, "calculateRook: "+ ChessUtility.positionToCode(tempPosition));
                 }
-                if (board.get(tempPosition).getColor() == board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    right = false;
-                }
-                if (board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    rookMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateRook: "+ ChessUtility.positionToCode(tempPosition));
-                    right = false;
-                }
-            }
-            else{
-                right = false;
-            }
-            if (row + i  <= 8 && up){
-                int tempPosition = rowCC(row+i, column);
-                //TODO SWitch (ha kezeli a null-t)
-                if (board.get(tempPosition).getColor() == null){
-                    rookMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateRook: "+ ChessUtility.positionToCode(tempPosition));
-                }
-                if (board.get(tempPosition).getColor() == board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    up = false;
-                }
-                if (board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    rookMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateRook: "+ ChessUtility.positionToCode(tempPosition));
-                    up = false;
-                }
-            }
-            else{
-                up = false;
-            }
-            if (row - i >= 1 && down){
-                int tempPosition = rowCC(row-i, column);
-                //TODO SWitch (ha kezeli a null-t)
-                if (board.get(tempPosition).getColor() == null){
-                    rookMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateRook: "+ ChessUtility.positionToCode(tempPosition));
-                }
-                if (board.get(tempPosition).getColor() == board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    down = false;
-                }
-                if (board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()){
-                    rookMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateRook: "+ ChessUtility.positionToCode(tempPosition));
-                    down = false;
-                }
-            }
-            else{
-                down = false;
+                if(board.get(tempPosition).getColor() != null) horizontal = false;
             }
         }
 
@@ -246,48 +118,26 @@ public class ChessUtility {
         ArrayList<String> pawnMoves = new ArrayList<>();
         int column = position.charAt(0) - 96;
         int row = Integer.parseInt(position.substring(1));
-        int tempPosition;
-        if (chessPiece.getColor() == ChessPiece.ChessColor.WHITE){
-            tempPosition = rowCC(row + 1, column);
-            if (board.get(tempPosition).getColor() == null){
-                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-            }
-            if (row == 2) {
-                tempPosition = rowCC(row + 2, column);
-                if (board.get(tempPosition).getColor() == null) {
-                    pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-                }
-            }
-            tempPosition = rowCC(row + 1, column - 1);
-            if (column >= 1 && board.get(tempPosition).getColor() == ChessPiece.ChessColor.BLACK){
-                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-            }
-            tempPosition = rowCC(row + 1, column + 1);
-            if (column <= 8 && board.get(tempPosition).getColor() == ChessPiece.ChessColor.BLACK){
-                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-            }
-        }
-        if (chessPiece.getColor() == ChessPiece.ChessColor.BLACK){
-            tempPosition = rowCC(row - 1, column);
-            if (board.get(tempPosition).getColor() == null){
-                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-            }
-            if (row == 7) {
-                tempPosition = rowCC(row - 2, column);
-                if (board.get(tempPosition).getColor() == null) {
-                    pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-                }
-            }
-            tempPosition = rowCC(row - 1, column - 1);
-            if (column >= 1 && board.get(tempPosition).getColor() == ChessPiece.ChessColor.WHITE){
-                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-            }
-            tempPosition = rowCC(row - 1, column + 1);
-            if (column <= 8 && board.get(tempPosition).getColor() == ChessPiece.ChessColor.WHITE){
-                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+
+        int rowModifier = chessPiece.getColor() == ChessPiece.ChessColor.WHITE ? 1 : - 1;
+        int tempPosition = rowCC(row + rowModifier, column);
+        if(board.get(tempPosition).getColor() == null) {
+            pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+            if(!chessPiece.isMoved()) {
+                tempPosition = rowCC(row + (rowModifier * 2), column);
+                if(board.get(tempPosition).getColor() == null) pawnMoves.add(ChessUtility.positionToCode(tempPosition));
             }
         }
 
+        tempPosition = rowCC(row + rowModifier, column - 1);
+        if (column >= 1 && board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != chessPiece.getColor()){
+            pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+        }
+        tempPosition = rowCC(row + rowModifier, column + 1);
+        if (column <= 8 && board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != chessPiece.getColor()){
+            pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+        }
+        //TODO: En-passant move
 
         return pawnMoves;
     }

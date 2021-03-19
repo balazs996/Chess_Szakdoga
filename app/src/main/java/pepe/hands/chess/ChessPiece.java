@@ -2,7 +2,13 @@ package pepe.hands.chess;
 
 public class ChessPiece {
     public enum ChessColor {
-        WHITE, BLACK
+        WHITE(0), BLACK(1);
+
+        public final int label;
+
+        ChessColor(int label) {
+            this.label = label;
+        }
     }
 
     public enum ChessType {
@@ -12,6 +18,7 @@ public class ChessPiece {
     private ChessColor color;
     private ChessType type;
     private char picture;
+    private boolean moved = false;
 
     public ChessPiece(ChessColor color, ChessType type) {
         this.color = color;
@@ -33,6 +40,8 @@ public class ChessPiece {
     public char getPicture() {
         return picture;
     }
+
+    public boolean isMoved() { return moved; }
 
     private void setPicture() {
         if (this.color.equals(ChessColor.WHITE)) {
@@ -92,4 +101,6 @@ public class ChessPiece {
             }
         }
     }
+
+    public void SetMoved() { moved = true; }
 }
