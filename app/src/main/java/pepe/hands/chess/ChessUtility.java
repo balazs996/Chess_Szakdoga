@@ -45,6 +45,7 @@ public class ChessUtility<moves> {
                 break;
             }
             case KNIGHT: {
+                moves = calculateKnight(position, board);
                 break;
             }
             case BISHOP: {
@@ -57,7 +58,7 @@ public class ChessUtility<moves> {
                 break;
             }
             case KING: {
-                //moves = calculateKing(position, board);
+                moves = calculateKing(position, board);
                 break;
             }
         }
@@ -141,6 +142,44 @@ public class ChessUtility<moves> {
         //TODO: En-passant move
 
         return pawnMoves;
+    }
+
+    private static ArrayList<String> calculateKing(String position, ArrayList<ChessPiece> board) {
+        ArrayList<String> kingMoves = new ArrayList<>();
+        int column = position.charAt(0) - 96;
+        int row = Integer.parseInt(position.substring(1));
+        ArrayList<Integer> multiply_values = new ArrayList<>(Arrays.asList(0, -1, 0, 1, -1, 0, 1, 0, 1, 1, -1, -1, -1, 1, 1, -1));
+        for (int i = 0; i < multiply_values.size(); i += 2) {
+            int rowX = row + (multiply_values.get(i));
+            int columnX = column + (multiply_values.get(i + 1));
+            if (columnX <= 8 && columnX >= 1 && rowX <= 8 && rowX >= 1) {
+                int tempPosition = rowCC(rowX, columnX);
+                if (board.get(tempPosition).getColor() == null || board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()) {
+                    kingMoves.add(ChessUtility.positionToCode(tempPosition));
+                    Log.d(TAG, "calculateKing: " + ChessUtility.positionToCode(tempPosition));
+                }
+            }
+        }
+        return kingMoves;
+    }
+
+    private static ArrayList<String> calculateKnight(String position, ArrayList<ChessPiece> board) {
+        ArrayList<String> knightMoves = new ArrayList<>();
+        int column = position.charAt(0) - 96;
+        int row = Integer.parseInt(position.substring(1));
+        ArrayList<Integer> multiply_values = new ArrayList<>(Arrays.asList(2, 1, 2, -1, -2, 1, -2, -1, 1, 2, 1, -2, -1, 2, -1, -2));
+        for (int i = 0; i < multiply_values.size(); i += 2) {
+            int rowX = row + (multiply_values.get(i));
+            int columnX = column + (multiply_values.get(i + 1));
+            if (columnX <= 8 && columnX >= 1 && rowX <= 8 && rowX >= 1) {
+                int tempPosition = rowCC(rowX, columnX);
+                if (board.get(tempPosition).getColor() == null || board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()) {
+                    knightMoves.add(ChessUtility.positionToCode(tempPosition));
+                    Log.d(TAG, "calculateKing: " + ChessUtility.positionToCode(tempPosition));
+                }
+            }
+        }
+        return knightMoves;
     }
 
 }
