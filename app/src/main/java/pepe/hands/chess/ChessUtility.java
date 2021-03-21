@@ -5,7 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ChessUtility {
+public class ChessUtility<moves> {
     private static final String TAG = "ChessUtility";
     public static int codeToPosition(String input) {
         return (8 - Integer.parseInt(input.substring(1))) * 8 + (((int) input.charAt(0)) - 97);
@@ -57,6 +57,7 @@ public class ChessUtility {
                 break;
             }
             case KING: {
+                //moves = calculateKing(position, board);
                 break;
             }
         }
@@ -141,4 +142,5 @@ public class ChessUtility {
 
         return pawnMoves;
     }
+
 }
