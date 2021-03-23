@@ -26,6 +26,10 @@ public class ChessPiece {
         setPicture();
     }
 
+    public static ChessColor getOpponentColor(ChessColor color){
+        return color == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
+    }
+
     public ChessPiece() {
     }
 

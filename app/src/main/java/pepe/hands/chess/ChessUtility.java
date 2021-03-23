@@ -66,6 +66,8 @@ public class ChessUtility<moves> {
         return moves;
     }
 
+    //Bábuk lépései
+
     private static ArrayList<String> calculateBishop(String position, ArrayList<ChessPiece> board) {
         ArrayList<String> bishopMoves = new ArrayList<>();
         int column = position.charAt(0) - 96;
@@ -79,13 +81,14 @@ public class ChessUtility<moves> {
             for(int i = 1; diagonal; i++) {
                 int rowX = ops[0].equals("+") ? row + i : row - i;
                 int columnX = ops[1].equals("+") ? column + i : column - i;
-                if(columnX > 8 || columnX < 1 || rowX > 8 || rowX < 1) break;
-                int tempPosition = rowCC(rowX, columnX);
-                if (board.get(tempPosition).getColor() == null || board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()) {
-                    bishopMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateBishop: "+ ChessUtility.positionToCode(tempPosition));
+                if (columnX <= 8 && columnX >= 1 && rowX <= 8 && rowX >= 1) {
+                    int tempPosition = rowCC(rowX, columnX);
+                    if (board.get(tempPosition).getColor() == null || board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()) {
+                        bishopMoves.add(ChessUtility.positionToCode(tempPosition));
+                        Log.d(TAG, "calculateBishop: " + ChessUtility.positionToCode(tempPosition));
+                    }
+                    if (board.get(tempPosition).getColor() != null) diagonal = false;
                 }
-                if(board.get(tempPosition).getColor() != null) diagonal = false;
             }
         }
 
@@ -103,13 +106,15 @@ public class ChessUtility<moves> {
             for (int j = 1; horizontal; j++) {
                 int rowX = row + (j* multiply_values.get(i));
                 int columnX = column + (j* multiply_values.get(i + 1));
-                if(columnX > 8 || columnX < 1 || rowX > 8 || rowX < 1) break;
-                int tempPosition = rowCC(rowX, columnX);
-                if (board.get(tempPosition).getColor() == null || board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()) {
-                    rookMoves.add(ChessUtility.positionToCode(tempPosition));
-                    Log.d(TAG, "calculateRook: "+ ChessUtility.positionToCode(tempPosition));
+                if (columnX <= 8 && columnX >= 1 && rowX <= 8 && rowX >= 1) {
+                    int tempPosition = rowCC(rowX, columnX);
+                    if (board.get(tempPosition).getColor() == null || board.get(tempPosition).getColor() != board.get(ChessUtility.codeToPosition(position)).getColor()) {
+                        rookMoves.add(ChessUtility.positionToCode(tempPosition));
+                        Log.d(TAG, "calculateRook: "+ ChessUtility.positionToCode(tempPosition));
+                    }
+                    if(board.get(tempPosition).getColor() != null) horizontal = false;
                 }
-                if(board.get(tempPosition).getColor() != null) horizontal = false;
+
             }
         }
 
@@ -146,6 +151,7 @@ public class ChessUtility<moves> {
 
     private static ArrayList<String> calculateKing(String position, ArrayList<ChessPiece> board) {
         ArrayList<String> kingMoves = new ArrayList<>();
+        ArrayList<String> checkMoves = attackedFields(position, board);
         int column = position.charAt(0) - 96;
         int row = Integer.parseInt(position.substring(1));
         ArrayList<Integer> multiply_values = new ArrayList<>(Arrays.asList(0, -1, 0, 1, -1, 0, 1, 0, 1, 1, -1, -1, -1, 1, 1, -1));
@@ -180,6 +186,20 @@ public class ChessUtility<moves> {
             }
         }
         return knightMoves;
+    }
+
+    //Sakk-Matt
+
+    private static ArrayList<String> attackedFields(String position, ArrayList<ChessPiece> board) {
+        ArrayList<String> checkedFields = new ArrayList<>();
+        ChessPiece.ChessColor opponentColor = ChessPiece.getOpponentColor(board.get(rowCC(Integer.parseInt(position.substring(1)), position.charAt(0) - 96)).getColor()); //TODO benjoe refaktoráld péeles :*
+        for (int i = 0; i < board.size(); i++) {
+            if (board.get(i).getColor() == opponentColor && board.get(i).getType() != ChessPiece.ChessType.KING){
+                checkedFields.addAll(calculateMoves(board.get(i), positionToCode(i), board));
+            }
+        }
+        Log.d(TAG, "attackedFields: " + checkedFields.size());
+        return checkedFields;
     }
 
 }
