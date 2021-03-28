@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     if(clickedPosition > 0) gv.getChildAt(clickedPosition).setBackgroundTintList(null);
 
                     clickedPosition = position;
-                    availablePositions = ChessUtility.calculateMoves(chessAdapter.getPiece(position), ChessUtility.positionToCode(position), pieces);
+                    availablePositions = ChessUtility.calculateMoves(chessAdapter.getPiece(position), ChessUtility.positionToCode(position), pieces, false);
                     gv.getChildAt(position).setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.pörpöl));
                     for (String tempPosition:availablePositions) {
                         gv.getChildAt(ChessUtility.codeToPosition(tempPosition)).setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.hugyosfos));
@@ -68,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
                     availablePositions.clear();
                     currentPlayer = (currentPlayer + 1) % 2;
                     gv.getChildAt(position).setBackgroundTintList(null);
+                    if(ChessUtility.inCheck(chessAdapter.pieces, currentPlayer == 0 ? ChessPiece.ChessColor.WHITE : ChessPiece.ChessColor.BLACK)){
+                        Toast.makeText(MainActivity.this, "Sakkba vagy te geci!", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else {
                     String errorMsg;

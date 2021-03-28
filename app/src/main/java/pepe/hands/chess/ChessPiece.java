@@ -85,7 +85,7 @@ public class ChessPiece {
                 case KNIGHT : {
                     this.picture = '\u265E';
                     break;
-                }
+            }
                 case BISHOP : {
                     this.picture = '\u265D';
                     break;

@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ChessUtility<moves> {
+
+    public enum gameStatus{
+        NORMAL, CHECK, STALEMATE, CHECKMATE
+
+    }
+
     private static final String TAG = "ChessUtility";
     public static int codeToPosition(String input) {
         return (8 - Integer.parseInt(input.substring(1))) * 8 + (((int) input.charAt(0)) - 97);
@@ -33,11 +39,11 @@ public class ChessUtility<moves> {
         return table;
     }
 
-    public static ArrayList<String> calculateMoves(ChessPiece chessPiece, String position, ArrayList<ChessPiece> board) {
+    public static ArrayList<String> calculateMoves(ChessPiece chessPiece, String position, ArrayList<ChessPiece> board, boolean onlyAttackMoves) {
         ArrayList<String> moves = new ArrayList<>();
         switch (chessPiece.getType()) {
             case PAWN: {
-                moves = calculatePawn(position, board, chessPiece);
+                moves = calculatePawn(position, board, chessPiece, onlyAttackMoves);
                 break;
             }
             case ROOK: {
@@ -89,6 +95,9 @@ public class ChessUtility<moves> {
                     }
                     if (board.get(tempPosition).getColor() != null) diagonal = false;
                 }
+                else{
+                    diagonal = false;
+                }
             }
         }
 
@@ -114,6 +123,9 @@ public class ChessUtility<moves> {
                     }
                     if(board.get(tempPosition).getColor() != null) horizontal = false;
                 }
+                else{
+                    horizontal = false;
+                }
 
             }
         }
@@ -121,30 +133,38 @@ public class ChessUtility<moves> {
         return rookMoves;
     }
 
-    private static ArrayList<String> calculatePawn(String position, ArrayList<ChessPiece> board, ChessPiece chessPiece) {
+    private static ArrayList<String> calculatePawn(String position, ArrayList<ChessPiece> board, ChessPiece chessPiece, boolean onlyAttacked) {
         ArrayList<String> pawnMoves = new ArrayList<>();
         int column = position.charAt(0) - 96;
         int row = Integer.parseInt(position.substring(1));
 
-        int rowModifier = chessPiece.getColor() == ChessPiece.ChessColor.WHITE ? 1 : - 1;
+        int rowModifier = chessPiece.getColor() == ChessPiece.ChessColor.WHITE ? 1 : -1;
         int tempPosition = rowCC(row + rowModifier, column);
-        if(board.get(tempPosition).getColor() == null) {
-            pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-            if(!chessPiece.isMoved()) {
-                tempPosition = rowCC(row + (rowModifier * 2), column);
-                if(board.get(tempPosition).getColor() == null) pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+        if (onlyAttacked) {
+            pawnMoves.add(ChessUtility.positionToCode(rowCC(row + rowModifier, column - 1)));
+            pawnMoves.add(ChessUtility.positionToCode(rowCC(row + rowModifier, column + 1)));
+        } else {
+            if (board.get(tempPosition).getColor() == null) {
+                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+                if (!chessPiece.isMoved()) {
+                    tempPosition = rowCC(row + (rowModifier * 2), column);
+                    if (board.get(tempPosition).getColor() == null)
+                        pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+                }
             }
-        }
 
-        tempPosition = rowCC(row + rowModifier, column - 1);
-        if (column >= 1 && board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != chessPiece.getColor()){
-            pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+            tempPosition = rowCC(row + rowModifier, column - 1);
+            if (column >= 1 && board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != chessPiece.getColor()) {
+                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+            }
+            tempPosition = rowCC(row + rowModifier, column + 1);
+            if (column <= 8 && board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != chessPiece.getColor()) {
+                pawnMoves.add(ChessUtility.positionToCode(tempPosition));
+            }
+
+
+            //TODO: En-passant move
         }
-        tempPosition = rowCC(row + rowModifier, column + 1);
-        if (column <= 8 && board.get(tempPosition).getColor() != null && board.get(tempPosition).getColor() != chessPiece.getColor()){
-            pawnMoves.add(ChessUtility.positionToCode(tempPosition));
-        }
-        //TODO: En-passant move
 
         return pawnMoves;
     }
@@ -166,6 +186,8 @@ public class ChessUtility<moves> {
                 }
             }
         }
+
+        kingMoves.removeAll(checkMoves);
         return kingMoves;
     }
 
@@ -191,15 +213,28 @@ public class ChessUtility<moves> {
     //Sakk-Matt
 
     private static ArrayList<String> attackedFields(String position, ArrayList<ChessPiece> board) {
-        ArrayList<String> checkedFields = new ArrayList<>();
+        ArrayList<String> attackedFields = new ArrayList<>();
         ChessPiece.ChessColor opponentColor = ChessPiece.getOpponentColor(board.get(rowCC(Integer.parseInt(position.substring(1)), position.charAt(0) - 96)).getColor()); //TODO benjoe refaktoráld péeles :*
         for (int i = 0; i < board.size(); i++) {
             if (board.get(i).getColor() == opponentColor && board.get(i).getType() != ChessPiece.ChessType.KING){
-                checkedFields.addAll(calculateMoves(board.get(i), positionToCode(i), board));
+                attackedFields.addAll(calculateMoves(board.get(i), positionToCode(i), board, true));
             }
         }
-        Log.d(TAG, "attackedFields: " + checkedFields.size());
-        return checkedFields;
+        Log.d(TAG, "attackedFields: " + attackedFields.size());
+        return attackedFields;
     }
+
+    public static boolean inCheck (ArrayList<ChessPiece> board, ChessPiece.ChessColor color){
+        String kingPosition = "";
+        for (int i = 0; i < board.size(); i++){
+            if (board.get(i).getType() == ChessPiece.ChessType.KING && board.get(i).getColor() == color){
+                kingPosition = positionToCode(i);
+            }
+        }
+        ArrayList<String> dangerZone = attackedFields(kingPosition, board);
+        return dangerZone.contains(kingPosition);
+    }
+
+
 
 }
