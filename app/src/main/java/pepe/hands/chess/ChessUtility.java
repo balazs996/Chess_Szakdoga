@@ -41,6 +41,7 @@ public class ChessUtility<moves> {
 
     public static ArrayList<String> calculateMoves(ChessPiece chessPiece, String position, ArrayList<ChessPiece> board, boolean onlyAttackMoves) {
         ArrayList<String> moves = new ArrayList<>();
+        //is inCheck or not
         switch (chessPiece.getType()) {
             case PAWN: {
                 moves = calculatePawn(position, board, chessPiece, onlyAttackMoves);
